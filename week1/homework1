@@ -1,0 +1,22 @@
+from collections import Counter
+import bisect
+
+def homework1(w):
+
+    counted_dict = []
+    anagram = []
+
+    for i in words.txt:
+        counted_dict.append([sorted(Counter(i).items()), i])
+    #counted_dict.sort
+
+    index_left = bisect.bisect_left(counted_dict, [sorted(Counter(w).items()), i])
+    index_right = bisect.bisect_right(counted_dict, [sorted(Counter(w).items()), i])
+    if (index_left != index_right) and (counted_dict[index_left][0] == Counter(w)):
+        anagram = [row[1] for counted_dict in counted_dict[index_left:index_right]]
+    
+
+    return anagram
+
+w = input()
+print(homework1(w))
