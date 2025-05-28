@@ -1,0 +1,12 @@
+from collections import Counter
+
+def search_word(w):
+    l=[]
+    ans = []
+    for i in words.txt:
+        l.append([i, Counter(i)])
+    if Counter(w)==Counter(i):
+        ans.append(i)
+
+
+w=input()
