@@ -1,20 +1,37 @@
-from collections import Counter
-import bisect
+# 与えられた文字列のAnagramを辞書ファイルから探して、「見つかったアナグラム全部」を答えるプログラムを作る
+
+# 二分探索
+def binary_search(sorted_dict, w):
+    left, right = 0, len(sorted_dict) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if sorted_dict[mid][0] == ''.join(sorted(w)):
+            anagram.append(sorted_dict[mid][1])
+        elif sorted_dict[mid][0] < ''.join(sorted(w)):
+            left = mid + 1
+        else:
+            right = mid - 1
+
+# words.txtを開く
+f = open('words.txt','r')
+words = f.read().splitlines()
+f.close()
 
 def homework1(w):
 
-    counted_dict = []
+    sorted_words = []
+    sorted_dict = []
     anagram = []
 
-    for i in words.txt:
-        counted_dict.append([sorted(Counter(i).items()), i])
-    #counted_dict.sort
+    # wordsの単語をそれぞれsortする
+    for i in words:
+        sorted_words.append([''.join(sorted(i)), i])
 
-    index_left = bisect.bisect_left(counted_dict, [sorted(Counter(w).items()), i])
-    index_right = bisect.bisect_right(counted_dict, [sorted(Counter(w).items()), i])
-    if (index_left != index_right) and (counted_dict[index_left][0] == Counter(w)):
-        anagram = [row[1] for counted_dict in counted_dict[index_left:index_right]]
-    
+    # sorted_wordを辞書順にsortする
+    sorted_dict = sorted(sorted_words, key=lambda x:x[0])
+
+    #二分探索
+    binary_search(sorted_dict, w)
 
     return anagram
 
