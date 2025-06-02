@@ -24,7 +24,7 @@ def binary_search(sorted_dict, w):
             right = mid - 1
 
 # words.txtを開く
-f = open('words.txt','r')
+f = open('../words.txt','r')
 words = f.read().splitlines()
 f.close()
 
