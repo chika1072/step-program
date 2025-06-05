@@ -2,6 +2,7 @@
 
 # 二分探索
 def binary_search(sorted_dict, w):
+    anagram = []
     left, right = 0, len(sorted_dict) - 1
     while left <= right:
         mid = (left + right) // 2
@@ -21,7 +22,6 @@ def homework1(w):
 
     sorted_words = []
     sorted_dict = []
-    anagram = []
 
     # wordsの単語をそれぞれsortする
     for i in words:
@@ -31,9 +31,7 @@ def homework1(w):
     sorted_dict = sorted(sorted_words, key=lambda x:x[0])
 
     #二分探索
-    binary_search(sorted_dict, w)
-
-    return anagram
+    return binary_search(sorted_dict, w)
 
 w = input()
 print(homework1(w))
