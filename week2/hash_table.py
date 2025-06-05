@@ -16,11 +16,10 @@ import random, sys, time
 def calculate_hash(key):
     assert type(key) == str
     # Note: This is not a good hash function. Do you see why?
-    # 'abc'と'cba'などの衝突が起こる -> 再ハッシュ
-    
+
     hash = 0
-    for i in key:
-        hash += ord(i)
+    for i, chr in enumerate(key):
+        hash += ord(chr) * (128 ** i)
     return hash
 
 
@@ -29,7 +28,7 @@ def calculate_hash(key):
 """
 def generate_size(n: int) -> int:
     calc_function = n**2 - n + 41
-    return calc_function
+    return int(calc_function)
 
 
 # An item object that represents one key - value pair in the hash table.
@@ -74,12 +73,14 @@ class HashTable:
             # self.item_countがおよそself.bucket_size * 0.3になるように調整
             self.size_number = int(1.5 * self.size_number)
             new_size = generate_size(self.size_number)
-            new_buckets = [None] * new_size
-            # self.buckets[bucket_index]を、すべてのbucket_indexに対して取り出したい
+            new_buckets = [None] * int(new_size)
+            # self.buckets[bucket_index]を、すべてのbucket_indexに対して取り出す
             for index in range(self.bucket_size):
                 item = self.buckets[index]
                 while item:
                     new_index = calculate_hash(item.key) % new_size
+                    if type(new_index) == float:
+                        print(new_index)
                     call_item = Item(item.key, item.value, new_buckets[new_index])
                     new_buckets[new_index] = call_item
                     item = item.next
@@ -90,11 +91,13 @@ class HashTable:
         if self.bucket_size > 145 and self.item_count <= self.bucket_size * 0.3:
             self.size_number = self.size_number // 1.5
             new_size = generate_size(self.size_number)
-            new_buckets = [None] * new_size
+            new_buckets = [None] * int(new_size)
             for index in range(self.bucket_size):
                 item = self.buckets[index]
                 while item:
                     new_index = calculate_hash(item.key) % new_size
+                    if type(new_index) == float:
+                        print(new_index)
                     call_item = Item(item.key, item.value, new_buckets[new_index])
                     new_buckets[new_index] = call_item
                     item = item.next
@@ -112,18 +115,18 @@ class HashTable:
     #               and the value is updated.
     def put(self, key, value):
         assert type(key) == str
-        self.rehash()   # 再ハッシュ
         self.check_size() # Note: Don't remove this code.
         bucket_index = calculate_hash(key) % self.bucket_size
-        item = self.buckets[bucket_index]   # 一番新しいものだけ認識される？
-        while item:   # why use while?
-            if item.key == key:   # 同じkeyだったらvalueだけ更新する？
+        item = self.buckets[bucket_index]
+        while item:
+            if item.key == key:
                 item.value = value
                 return False
             item = item.next
         new_item = Item(key, value, self.buckets[bucket_index])
         self.buckets[bucket_index] = new_item   # dict?
         self.item_count += 1
+        self.rehash()
         return True
 
     # Get an item from the hash table.
@@ -149,7 +152,6 @@ class HashTable:
     #               otherwise.
     def delete(self, key):
         assert type(key) == str
-        self.rehash()
         bucket_index = calculate_hash(key) % self.bucket_size
         item = self.buckets[bucket_index]
         prev_item = None  # deleteに伴ってitem.nextの値がずれることを解消するためにprev_itemを導入
@@ -160,6 +162,7 @@ class HashTable:
                 else:         # もし存在しないなら、item.nextを先頭にする
                     self.buckets[bucket_index] = item.next
                 self.item_count -= 1
+                self.rehash()
                 return True
             item = item.next
             prev_item = item
@@ -276,7 +279,7 @@ def performance_test():
             rand = random.randint(0, 100000000)
             hash_table.delete(str(rand))
 
-    assert hash_table.size() == 0
+    assert hash_table.size() == 0,"hash table size is "+str(hash_table.size())
     print("Performance tests passed!")
 
 
