@@ -8,16 +8,6 @@ def binary_search(sorted_dict, w):
         mid = (left + right) // 2
         if sorted_dict[mid][0] == ''.join(sorted(w)):
             anagram.append(sorted_dict[mid][1])
-            #anagramが複数あるか確認する
-            i = 1
-            while mid + i < len(sorted_dict) and sorted_dict[mid + i][0] == ''.join(sorted(w)):
-                anagram.append(sorted_dict[mid + i][1])
-                i += 1
-            i = 1
-            while mid - i < len(sorted_dict) and sorted_dict[mid - i][0] == ''.join(sorted(w)):
-                anagram.append(sorted_dict[mid - i][1])
-                i += 1
-            return anagram
         elif sorted_dict[mid][0] < ''.join(sorted(w)):
             left = mid + 1
         else:
