@@ -23,12 +23,13 @@ def binary_search(sorted_dict, w):
         else:
             right = mid - 1
 
-# words.txtを開く
-f = open('week1/words.txt','r')
-words = f.read().splitlines()
-f.close()
 
 def main():
+    # words.txtを開く
+    f = open('week1/words.txt','r')
+    words = f.read().splitlines()
+    f.close()
+
 
     sorted_words = []
     sorted_dict = []
