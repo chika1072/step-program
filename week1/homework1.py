@@ -8,30 +8,45 @@ def binary_search(sorted_dict, w):
         mid = (left + right) // 2
         if sorted_dict[mid][0] == ''.join(sorted(w)):
             anagram.append(sorted_dict[mid][1])
+            #anagramが複数あるか確認する
+            i = 1
+            while mid + i < len(sorted_dict) and sorted_dict[mid + i][0] == ''.join(sorted(w)):
+                anagram.append(sorted_dict[mid + i][1])
+                i += 1
+            i = 1
+            while mid - i < len(sorted_dict) and sorted_dict[mid - i][0] == ''.join(sorted(w)):
+                anagram.append(sorted_dict[mid - i][1])
+                i += 1
+            return anagram
         elif sorted_dict[mid][0] < ''.join(sorted(w)):
             left = mid + 1
         else:
             right = mid - 1
 
 # words.txtを開く
-f = open('words.txt','r')
+f = open('week1/words.txt','r')
 words = f.read().splitlines()
 f.close()
 
-def homework1(w):
+def main():
 
     sorted_words = []
     sorted_dict = []
 
     # wordsの単語をそれぞれsortする
-    for i in words:
-        sorted_words.append([''.join(sorted(i)), i])
+    for word in words:
+        sorted_words.append([''.join(sorted(word)), word])
 
-    # sorted_wordを辞書順にsortする
+    # wordsの単語をそれぞれsortする
     sorted_dict = sorted(sorted_words, key=lambda x:x[0])
 
-    #二分探索
-    return binary_search(sorted_dict, w)
+    print('Input a word: ')
+    input_word = input()
+    print('Anagram: ')
 
-w = input()
-print(homework1(w))
+    anagram = binary_search(sorted_dict, input_word)
+    print(anagram)
+
+
+if __name__ == "__main__":
+    main()
