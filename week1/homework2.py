@@ -9,6 +9,7 @@ def score(word):
         score += SCORES[ord(char) - ord('a')]
     return score
 
+
 # wordをscoreの大きい順に格納する
 def sorted_words(words):
     word_score = [[word, score(word)] for word in words]

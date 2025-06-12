@@ -105,7 +105,6 @@ class HashTable:
             self.buckets = new_buckets
 
 
-
     # Put an item to the hash table. If the key already exists, the
     # corresponding value is updated to a new value.
     #
@@ -129,6 +128,7 @@ class HashTable:
         self.rehash()
         return True
 
+
     # Get an item from the hash table.
     #
     # |key|: The key.
@@ -144,6 +144,7 @@ class HashTable:
                 return (item.value, True)
             item = item.next
         return (None, False)
+
 
     # Delete an item from the hash table.
     #
@@ -164,8 +165,8 @@ class HashTable:
                 self.item_count -= 1
                 self.rehash()
                 return True
-            item = item.next
             prev_item = item
+            item = item.next
         return False
         
 
@@ -272,14 +273,13 @@ def performance_test():
             hash_table.get(str(rand))
         end = time.time()
         print("%d %.6f" % (iteration, end - begin))
-
     for iteration in range(100):
         random.seed(iteration)
         for i in range(10000):
             rand = random.randint(0, 100000000)
             hash_table.delete(str(rand))
 
-    assert hash_table.size() == 0,"hash table size is "+str(hash_table.size())
+    assert hash_table.size() == 0
     print("Performance tests passed!")
 
 

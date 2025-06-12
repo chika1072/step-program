@@ -1,5 +1,7 @@
 # 与えられた文字列のAnagramを辞書ファイルから探して、「見つかったアナグラム全部」を答えるプログラムを作る
 
+import sys
+
 # 二分探索
 def binary_search(sorted_dict, w):
     anagram = []

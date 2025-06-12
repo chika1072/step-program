@@ -1,3 +1,5 @@
+# 電卓プログラムをモジュール化して機能を追加する
+
 #! /usr/bin/python3
 import unicodedata
 import sys
@@ -104,7 +106,7 @@ def tokenize(line):
 
 
 # かっこの計算
-def parentheses(tokens):
+def calculate_parentheses(tokens):
     # 2(1+3)のように、かっこの前の'*'が省略されている場合に、'*'を付け加える
     for index in range(len(tokens)):
         if (tokens[index]['type'] == 'LEFT_PARENTHESIS') and (tokens[index - 1]['type'] == 'NUMBER'):
@@ -121,8 +123,8 @@ def parentheses(tokens):
             # ')'の一つ前から読み取る
             index -= 1
             # '('が存在するまでindexを一つずつ小さくしていき、
-            # 計算の順番になるようにinside_parenthesisに中身を追加する
-            inside_parenthesis = []
+           inside # 計算の順番になるようにinside_parenthesisに中身を追加する
+            _parenthesis = []
             while tokens[index]['type'] != 'LEFT_PARENTHESIS':
                 inside_parenthesis.insert(0, tokens[index])
                 index -= 1
@@ -130,7 +132,7 @@ def parentheses(tokens):
             inside_answer = evaluate(inside_parenthesis)
 
             # '('の一つ前が関数なら関数を適用
-            if (tokens[index - 1]['type'] == 'ABS' or 'INT' or 'ROUND'):
+            if (tokens[index - 1]['type'] in {'ABS', 'INT', 'ROUND'}):
                 # indexを関数の位置に合わせる
                 index -= 1
                 if tokens[index]['type'] == 'ABS':
@@ -143,11 +145,11 @@ def parentheses(tokens):
                 # かっこの中身の結果を新しいtokenとしてinsertする
                 del tokens[index : right_index + 1]
                 tokens.insert(index, {'type': 'NUMBER', 'number': inside_answer})
+                
             # 関数でないなら'('から')'までをdeleteする
             else:
                 del tokens[index : right_index + 1]
                 tokens.insert(index, {'type': 'NUMBER', 'number': inside_answer})
-        print(tokens)
         index += 1
 
 
@@ -189,13 +191,11 @@ def evaluate(tokens):
     answer = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 1  # dummy tokenの次から読み取る
-
     # かっこの計算を行う
-    parentheses(tokens)
-    
+    calculate_parentheses(tokens)
     # 掛け算と割り算を行う
-    multiply_divide(tokens)  # このままでにしておいて良いのか
-    
+    multiply_divide(tokens)
+    # 足し算と引き算を行う
     while index < len(tokens):
         if tokens[index]['type'] == 'NUMBER':
             if tokens[index - 1]['type'] == 'PLUS':
@@ -210,7 +210,7 @@ def evaluate(tokens):
 
 
 def test(line):
-    line = normalize_expression(line)  # 新しい変数を置いた方がいい？
+    line = normalize_expression(line)
     line = line.replace(' ', '')  # スペースがあれば除く
     tokens = tokenize(line)
     actual_answer = evaluate(tokens)
@@ -220,7 +220,7 @@ def test(line):
     else:
         print(f"FAIL! ({line} should be {expected_answer} but was {actual_answer})")
 
-"""
+
 # Add more tests to this function :)
 def run_test():
     print("==== Test started! ====")
@@ -242,19 +242,19 @@ def run_test():
     test("(1+2*(3-4))/5")  # 複数かっこ
     test("(1)")  # かっこの中に数字
     test("abs(-1)")  # absの中に数字
-    test("int(1.5))")  # intの中に数字
+    test("int(1.5)")  # intの中に数字
     test("round(1.5)")  # roundの中に数字
     test("abs(1-2)")  # absの中に式
     test("int(1.2-3.4)")  # intの中に式
     test("round(1.1*2.2)")  # roundの中に式
-    test("1+abs(-2*int(1.2+3,4))")  # 関数の二重構造
+    test("1+abs(-2*int(1.2+3.4))")  # 関数の二重構造
     test("12+abs(int(round(-1.55)+abs(int(-2.3+4))))")  # 関数の多重構造
     test("１＋２")  # 全角の入力
     test("1 / (2 - 3) + 4 * 5")  # スペースを含む入力
     print("==== Test finished! ====\n")
 
 run_test()
-"""
+
 
 while True:
     print('> ', end="")
@@ -262,5 +262,6 @@ while True:
     line = normalize_expression(line)  # 規格化
     line = line.replace(' ', '')  # スペースがあれば除く
     tokens = tokenize(line)
+    print(tokens)
     answer = evaluate(tokens)
     print(f"answer = {answer}\n")
