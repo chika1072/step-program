@@ -123,8 +123,8 @@ def calculate_parentheses(tokens):
             # ')'の一つ前から読み取る
             index -= 1
             # '('が存在するまでindexを一つずつ小さくしていき、
-           inside # 計算の順番になるようにinside_parenthesisに中身を追加する
-            _parenthesis = []
+            # 計算の順番になるようにinside_parenthesisに中身を追加する
+            inside_parenthesis = []
             while tokens[index]['type'] != 'LEFT_PARENTHESIS':
                 inside_parenthesis.insert(0, tokens[index])
                 index -= 1
