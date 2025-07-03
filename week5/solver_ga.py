@@ -23,10 +23,10 @@ def distance(city1, city2):
 def solve(cities):
 
     """ パラメータ """
-    island_number = 2      # 島の数
-    paths_in_island = 10   # 島に含まれるpathの数
+    island_number = 4      # 島の数
+    paths_in_island = 50   # 島に含まれるpathの数
     migration_rate = 0.3   # 各世代の生成後に、他の島に移動させるpathの割合
-    generations = 5       # 世代数   
+    generations = 300       # 世代数   
 
     N = len(cities)
 
@@ -47,7 +47,17 @@ def solve(cities):
             # 各島に含まれるpathの数だけsequenceをrandomに並べ、初代を生成
             for _ in range(paths_in_island):
                 random_list = random.sample(sequence, N)
+                
+                # 2-opt
+                for i in range(N-3):
+                    for j in range(i+2, N-1):
+                        # もしi->i+1, j->j+1の長さよりも、i->j, i+1->j+1のほうが短いなら
+                        if dist[random_list[i]][random_list[i+1]] + dist[random_list[j]][random_list[j+1]] > dist[random_list[i]][random_list[j]] + dist[random_list[i+1]][random_list[j+1]]:
+                            # pathを入れ替える
+                            random_list = random_list[:i+1] + random_list[j:i:-1] + random_list[j+1:]
+
                 generation_zero[island].append(random_list)
+        
         return generation_zero
     
 
@@ -64,14 +74,12 @@ def solve(cities):
             # 親1と親2に対して、3つのpathの内、距離が最小のものをmin_length_pathとする
             for i in range(2):
                 for path in tournament[i]:
-                    path_length = sum(dist[path[i]][path[(i + 1) % N]] for i in range(N))
+                    path_length = sum(dist[path[j]][path[(j + 1) % N]] for j in range(N))
                     if  path_length < min_length:
                         min_length = path_length
                         min_length_path = path
                 parents.append(min_length_path)
-            # parents_poolにまだ存在しないならば、parentsをparents_poolに加える
-            if parents not in parents_pool:
-                parents_pool.append(parents)
+            parents_pool.append(parents)
         return parents_pool
 
     
@@ -167,7 +175,6 @@ def solve(cities):
 
 
 if __name__ == '__main__':
-    slow_process()
     assert len(sys.argv) > 1
     tour = solve(read_input(sys.argv[1]))
     print_tour(tour)
