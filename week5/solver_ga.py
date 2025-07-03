@@ -6,10 +6,6 @@ import random
 from tqdm import tqdm
 import time
 
-def slow_process():
-    for i in tqdm(range(100), desc="処理中"):
-        time.sleep(0.01)
-        sys.stdout.flush()
 
 # "common.py" ファイルから print_tour と read_input を import
 from common import print_tour, read_input
@@ -24,9 +20,9 @@ def solve(cities):
 
     """ パラメータ """
     island_number = 4      # 島の数
-    paths_in_island = 50   # 島に含まれるpathの数
-    migration_rate = 0.3   # 各世代の生成後に、他の島に移動させるpathの割合
-    generations = 300       # 世代数   
+    paths_in_island = 100   # 島に含まれるpathの数
+    migration_rate = 0.2   # 各世代の生成後に、他の島に移動させるpathの割合
+    generations = 500       # 世代数   
 
     N = len(cities)
 
@@ -38,25 +34,47 @@ def solve(cities):
             dist[i][j] = dist[j][i] = distance(cities[i], cities[j])
 
 
-    def initialization():
+    """ 貪欲法と2-optを、初めからある程度短距離のpathを用意するために使う """ 
+    # greedy法(ランダム性あり)
+    def greedy(tour):
+        current_city = random.randint(0, N-1)
+        unvisited_cities = set(range(0, N))
+        unvisited_cities.remove(current_city)  #  unvisited_citiesから、current_cityだけ除外
+        tour = [current_city]
+
+        while unvisited_cities:
+            next_city = min(unvisited_cities,
+                            key=lambda city: dist[current_city][city])
+            # 距離の短い3個のcityの中からランダムに1つ選ぶ
+            nearest_3 = sorted(unvisited_cities, key=lambda city: dist[current_city][city])[:3]
+            next_city = random.choice(nearest_3)
+            unvisited_cities.remove(next_city)
+            tour.append(next_city)
+            current_city = next_city
+        return tour
+    
+    # 2-opt
+    def two_opt(tour):
+        for i in range(N-3):
+            for j in range(i+2, N-1):
+                # もしi->i+1, j->j+1の長さよりも、i->j, i+1->j+1のほうが短いなら
+                if dist[tour[i]][tour[i+1]] + dist[tour[j]][tour[j+1]] > dist[tour[i]][tour[j]] + dist[tour[i+1]][tour[j+1]]:
+                    # pathを入れ替える
+                    tour = tour[:i+1] + tour[j:i:-1] + tour[j+1:]
+        return tour
+
+
+    def initialization(cities):
         """ 初代を生成 """
         sequence = list(range(N))   # 0, 1, ... , N-1
         generation_zero = [[] for _ in range(island_number)]
         # それぞれの島に対して
         for island in range(island_number):
-            # 各島に含まれるpathの数だけsequenceをrandomに並べ、初代を生成
+            # 各島に含まれるpathの数だけ貪欲法で生成し、2-optで改善しておく
             for _ in range(paths_in_island):
-                random_list = random.sample(sequence, N)
-                
-                # 2-opt
-                for i in range(N-3):
-                    for j in range(i+2, N-1):
-                        # もしi->i+1, j->j+1の長さよりも、i->j, i+1->j+1のほうが短いなら
-                        if dist[random_list[i]][random_list[i+1]] + dist[random_list[j]][random_list[j+1]] > dist[random_list[i]][random_list[j]] + dist[random_list[i+1]][random_list[j+1]]:
-                            # pathを入れ替える
-                            random_list = random_list[:i+1] + random_list[j:i:-1] + random_list[j+1:]
-
-                generation_zero[island].append(random_list)
+                initial_list = greedy(cities)          # 貪欲法
+                initial_list = two_opt(initial_list)   # 2-opt
+                generation_zero[island].append(initial_list)
         
         return generation_zero
     
@@ -154,7 +172,7 @@ def solve(cities):
         return islands
 
 
-    generation = initialization()
+    generation = initialization(cities)
     for _ in range(generations):
         new_generation = []
         for i in range(island_number):

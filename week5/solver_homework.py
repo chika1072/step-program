@@ -61,12 +61,17 @@ def solve(cities):
             tour = temporary_tour
 
     # 2-opt
-    for i in range(N-3):
-        for j in range(i+2, N-1):
-            # もしi->i+1, j->j+1の長さよりも、i->j, i+1->j+1のほうが短いなら
-            if dist[tour[i]][tour[i+1]] + dist[tour[j]][tour[j+1]] > dist[tour[i]][tour[j]] + dist[tour[i+1]][tour[j+1]]:
-                # pathを入れ替える
-                tour = tour[:i+1] + tour[j:i:-1] + tour[j+1:]
+    while True:
+        cnt = 0
+        for i in range(N-3):
+            for j in range(i+2, N-1):
+                # もしi->i+1, j->j+1の長さよりも、i->j, i+1->j+1のほうが短いなら
+                if dist[tour[i]][tour[i+1]] + dist[tour[j]][tour[j+1]] > dist[tour[i]][tour[j]] + dist[tour[i+1]][tour[j+1]]:
+                    # pathを入れ替える
+                    tour = tour[:i+1] + tour[j:i:-1] + tour[j+1:]
+                    cnt += 1
+        if cnt == 0:  #改善がみられなかったら終了
+            break
  
     return tour
 
