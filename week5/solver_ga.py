@@ -80,7 +80,7 @@ def solve(cities):
     
 
     def selection(parent_generation: list[list[int]]) -> list[list[list[int]]]:
-        """ トーナメント方式で親となるpathの組を paths_in_island 個作成し、重複しないものだけを選択 """
+        """ トーナメント方式で親となるpathの組を paths_in_island 個作成 """
         parents = []        # 生成した親を一旦保持
         parents_pool = []   # 生成した親の組み合わせを保持
         while (len(parents_pool) < paths_in_island):   # paths_in_island 個作成
