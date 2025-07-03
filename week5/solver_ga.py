@@ -24,9 +24,9 @@ def solve(cities):
 
     """ パラメータ """
     island_number = 2      # 島の数
-    paths_in_island = 30   # 島に含まれるpathの数
+    paths_in_island = 10   # 島に含まれるpathの数
     migration_rate = 0.3   # 各世代の生成後に、他の島に移動させるpathの割合
-    generations = 20       # 世代数   
+    generations = 5       # 世代数   
 
     N = len(cities)
 
@@ -106,13 +106,13 @@ def solve(cities):
             while child1[i] in map1:
                 child1[i] = map1[child1[i]]
             while child2[i] in map2:
-                child2[i] = map1[child2[i]]
+                child2[i] = map2[child2[i]]
         # end+1 ~ 最後 まで
-        for i in range(end+1, N):
+        for i in range(end, N):
             while child1[i] in map1:
                 child1[i] = map1[child1[i]]
             while child2[i] in map2:
-                child2[i] = map1[child2[i]]
+                child2[i] = map2[child2[i]]
 
         return child1, child2
 
@@ -158,6 +158,7 @@ def solve(cities):
             evaluated = evaluation(children)
             new_generation.append(evaluated)
         generation = immigration(new_generation)
+
 
     tour = min((path for island in generation for path in island),
     key=lambda path: sum(dist[path[i]][path[(i + 1) % N]] for i in range(N)))

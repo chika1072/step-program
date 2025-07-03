@@ -9,10 +9,10 @@ CHALLENGES = 7
 
 def generate_sample_output():
     for i in range(CHALLENGES):
-        cities = read_input(f'input_{i}.csv')
+        cities = read_input('input_2.csv')
         solver, name = solver_ga, "output"
         tour = solver.solve(cities)
-        with open(f'{name}_{i}.csv', 'w') as f:
+        with open(f'{name}_2.csv', 'w') as f:
             f.write(format_tour(tour) + '\n')
 
 
