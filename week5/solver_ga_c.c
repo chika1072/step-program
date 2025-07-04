@@ -77,28 +77,6 @@ void greedy(int* tour) {
     free(visited);
 }
 
-void two_opt(int* tour) {
-    int improved = 1;
-    while (improved) {
-        improved = 0;
-        for (int i = 0; i < N - 1; ++i) {
-            for (int j = i + 2; j < N; ++j) {
-                int a = tour[i], b = tour[(i + 1) % N];
-                int c = tour[j], d = tour[(j + 1) % N];
-                double before = dist[a][b] + dist[c][d];
-                double after = dist[a][c] + dist[b][d];
-                if (after < before) {
-                    for (int k = 0; k < (j - i) / 2 + 1; ++k) {
-                        int tmp = tour[i + 1 + k];
-                        tour[i + 1 + k] = tour[j - k];
-                        tour[j - k] = tmp;
-                    }
-                    improved = 1;
-                }
-            }
-        }
-    }
-}
 
 double evaluate_path(int* path) {
     double length = 0;
@@ -148,7 +126,6 @@ void init_islands() {
         for (int i = 0; i < PATHS_IN_ISLAND; ++i) {
             islands[is][i].tour = malloc(sizeof(int) * N);
             greedy(islands[is][i].tour);
-            two_opt(islands[is][i].tour);
             islands[is][i].length = evaluate_path(islands[is][i].tour);
         }
     }
