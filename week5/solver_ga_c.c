@@ -4,9 +4,9 @@
 #include <time.h>
 #include <string.h>
 
-#define ISLANDS 4
-#define PATHS_IN_ISLAND 100
-#define GENERATIONS 500
+#define ISLANDS 6
+#define PATHS_IN_ISLAND 200
+#define GENERATIONS 10000
 #define MIGRATION_RATE 0.2
 
 typedef struct {
