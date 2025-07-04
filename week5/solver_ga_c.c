@@ -34,14 +34,69 @@ void compute_distances() {
     }
 }
 
-void random_tour(int* tour) {
-    for (int i = 0; i < N; ++i)
-        tour[i] = i;
-    for (int i = N - 1; i > 0; --i) {
-        int j = rand() % (i + 1);
-        int tmp = tour[i];
-        tour[i] = tour[j];
-        tour[j] = tmp;
+void greedy(int* tour) {
+    int* visited = calloc(N, sizeof(int));
+    int current = rand() % N;
+    visited[current] = 1;
+    tour[0] = current;
+
+    for (int i = 1; i < N; ++i) {
+        // 最も近い未訪問都市を3つ探す
+        int candidates[3] = {-1, -1, -1};
+        double distances[3] = {INFINITY, INFINITY, INFINITY};
+
+        for (int j = 0; j < N; ++j) {
+            if (visited[j]) continue;
+            double d = dist[current][j];
+
+            // 値が小さい順に挿入
+            for (int k = 0; k < 3; ++k) {
+                if (d < distances[k]) {
+                    for (int l = 2; l > k; --l) {
+                        distances[l] = distances[l - 1];
+                        candidates[l] = candidates[l - 1];
+                    }
+                    distances[k] = d;
+                    candidates[k] = j;
+                    break;
+                }
+            }
+        }
+
+        // 候補の中からランダムに1つ選ぶ
+        int n_candidates = 0;
+        for (int k = 0; k < 3; ++k)
+            if (candidates[k] != -1) n_candidates++;
+        int selected = candidates[rand() % n_candidates];
+
+        tour[i] = selected;
+        visited[selected] = 1;
+        current = selected;
+    }
+
+    free(visited);
+}
+
+void two_opt(int* tour) {
+    int improved = 1;
+    while (improved) {
+        improved = 0;
+        for (int i = 0; i < N - 1; ++i) {
+            for (int j = i + 2; j < N; ++j) {
+                int a = tour[i], b = tour[(i + 1) % N];
+                int c = tour[j], d = tour[(j + 1) % N];
+                double before = dist[a][b] + dist[c][d];
+                double after = dist[a][c] + dist[b][d];
+                if (after < before) {
+                    for (int k = 0; k < (j - i) / 2 + 1; ++k) {
+                        int tmp = tour[i + 1 + k];
+                        tour[i + 1 + k] = tour[j - k];
+                        tour[j - k] = tmp;
+                    }
+                    improved = 1;
+                }
+            }
+        }
     }
 }
 
@@ -92,7 +147,8 @@ void init_islands() {
     for (int is = 0; is < ISLANDS; ++is) {
         for (int i = 0; i < PATHS_IN_ISLAND; ++i) {
             islands[is][i].tour = malloc(sizeof(int) * N);
-            random_tour(islands[is][i].tour);
+            greedy(islands[is][i].tour);
+            two_opt(islands[is][i].tour);
             islands[is][i].length = evaluate_path(islands[is][i].tour);
         }
     }
