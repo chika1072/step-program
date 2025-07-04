@@ -5,8 +5,8 @@
 #include <string.h>
 
 #define ISLANDS 6
-#define PATHS_IN_ISLAND 200
-#define GENERATIONS 15000
+#define PATHS_IN_ISLAND 150
+#define GENERATIONS 10000
 #define MIGRATION_RATE 0.2
 
 typedef struct {

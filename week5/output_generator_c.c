@@ -3,7 +3,7 @@
 #include <string.h>
 #include "solver.h"
 
-#define CHALLENGES 7
+#define CHALLENGES 4
 
 typedef struct {
     int x;
@@ -66,7 +66,7 @@ char* format_tour(int* tour, int num_cities) {
 
 // 入力 → 出力ファイル生成ループ
 void generate_sample_output() {
-    for (int i = 0; i < CHALLENGES; i++) {
+    for (int i = 3; i <= 6; i++) {
         char input_filename[64];
         snprintf(input_filename, sizeof(input_filename), "input_%d.csv", i);
 
