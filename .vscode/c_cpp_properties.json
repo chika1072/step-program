@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "includePath": [
+                "C:/msys64/mingw64/include/c++/15.1.0",
+                "C:/msys64/mingw64/include"
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -22,7 +22,7 @@ def solve(cities):
     island_number = 4      # 島の数
     paths_in_island = 100   # 島に含まれるpathの数
     migration_rate = 0.2   # 各世代の生成後に、他の島に移動させるpathの割合
-    generations = 500       # 世代数   
+    generations = 5000       # 世代数   
 
     N = len(cities)
 
