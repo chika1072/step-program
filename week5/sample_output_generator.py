@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 from common import format_tour, read_input
-import ctypes
 
-solver = ctypes.CDLL('solver_ga_c.c')
-result = solver.solve(cities)  # 適切な引数と戻り値の設定が必要
+import solver_homework
 
 CHALLENGES = 7
 
