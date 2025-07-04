@@ -6,7 +6,7 @@
 
 #define ISLANDS 6
 #define PATHS_IN_ISLAND 200
-#define GENERATIONS 10000
+#define GENERATIONS 15000
 #define MIGRATION_RATE 0.2
 
 typedef struct {
@@ -34,6 +34,17 @@ void compute_distances() {
     }
 }
 
+void random_tour(int* tour) {
+    for (int i = 0; i < N; ++i)
+        tour[i] = i;
+    for (int i = N - 1; i > 0; --i) {
+        int j = rand() % (i + 1);
+        int tmp = tour[i];
+        tour[i] = tour[j];
+        tour[j] = tmp;
+    }
+}
+
 double evaluate_path(int* path) {
     double length = 0;
     for (int i = 0; i < N; ++i)
@@ -43,52 +54,6 @@ double evaluate_path(int* path) {
 
 void copy_path(int* src, int* dest) {
     memcpy(dest, src, sizeof(int) * N);
-}
-
-void greedy(int* tour) {
-    int* visited = calloc(N, sizeof(int));
-    int current = rand() % N;
-    visited[current] = 1;
-    tour[0] = current;
-
-    for (int i = 1; i < N; ++i) {
-        int candidates[3], count = 0;
-        for (int j = 0; j < N; ++j) {
-            if (!visited[j]) {
-                if (count < 3) {
-                    candidates[count++] = j;
-                } else {
-                    for (int k = 0; k < 3; ++k)
-                        if (dist[current][j] < dist[current][candidates[k]]) {
-                            candidates[k] = j;
-                            break;
-                        }
-                }
-            }
-        }
-        int next = candidates[rand() % count];
-        tour[i] = next;
-        visited[next] = 1;
-        current = next;
-    }
-
-    free(visited);
-}
-
-void two_opt(int* tour) {
-    for (int i = 0; i < N - 3; ++i) {
-        for (int j = i + 2; j < N - 1; ++j) {
-            double before = dist[tour[i]][tour[i+1]] + dist[tour[j]][tour[j+1]];
-            double after  = dist[tour[i]][tour[j]] + dist[tour[i+1]][tour[j+1]];
-            if (after < before) {
-                for (int k = 0; k < (j - i) / 2; ++k) {
-                    int tmp = tour[i+1+k];
-                    tour[i+1+k] = tour[j-k];
-                    tour[j-k] = tmp;
-                }
-            }
-        }
-    }
 }
 
 void pmx_crossover(int* p1, int* p2, int* c1, int* c2) {
@@ -127,8 +92,7 @@ void init_islands() {
     for (int is = 0; is < ISLANDS; ++is) {
         for (int i = 0; i < PATHS_IN_ISLAND; ++i) {
             islands[is][i].tour = malloc(sizeof(int) * N);
-            greedy(islands[is][i].tour);
-            two_opt(islands[is][i].tour);
+            random_tour(islands[is][i].tour);
             islands[is][i].length = evaluate_path(islands[is][i].tour);
         }
     }

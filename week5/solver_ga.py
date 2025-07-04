@@ -3,8 +3,6 @@
 import sys
 import math
 import random
-from tqdm import tqdm
-import time
 
 
 # "common.py" ファイルから print_tour と read_input を import
