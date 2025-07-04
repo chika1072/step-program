@@ -1,73 +1,105 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "solver.h"
 
 #define CHALLENGES 7
-#define MAX_N 1000
 
 typedef struct {
-    double x, y;
+    int x;
+    int y;
 } City;
 
-// 仮のツアー生成（順番通りに並べるだけ）
-void simple_solver(int *tour, int n) {
-    for (int i = 0; i < n; ++i) {
-        tour[i] = i;
+// 入力読み込み関数
+City* read_input(const char* filename, int* num_cities) {
+    FILE* f = fopen(filename, "r");
+    if (!f) return NULL;
+
+    int capacity = 128;
+    City* cities = malloc(sizeof(City) * capacity);
+    *num_cities = 0;
+
+    char line[256];
+    fgets(line, sizeof(line), f);  // 1行目スキップ
+
+    while (fgets(line, sizeof(line), f)) {
+        if (*num_cities >= capacity) {
+            capacity *= 2;
+            cities = realloc(cities, sizeof(City) * capacity);
+        }
+        char* token = strtok(line, ",");
+        double x = atof(token);
+        token = strtok(NULL, ",");
+        double y = atof(token);
+        cities[*num_cities].x = x;
+        cities[*num_cities].y = y;
+        (*num_cities)++;
     }
+
+    fclose(f);
+    return cities;
 }
 
-// CSV入力（ヘッダー付き）を読み込む
-int read_input(const char *filename, City cities[]) {
-    FILE *fp = fopen(filename, "r");
-    if (!fp) {
-        fprintf(stderr, "ファイルが開けません: %s\n", filename);
-        return -1;
+// City → double[ ][2] 変換関数
+double (*convert_city_array(City* cities, int num_cities))[2] {
+    double (*converted)[2] = malloc(sizeof(double[2]) * num_cities);
+    for (int i = 0; i < num_cities; ++i) {
+        converted[i][0] = (double)cities[i].x;
+        converted[i][1] = (double)cities[i].y;
     }
-
-    char line[100];
-    fgets(line, sizeof(line), fp); // ヘッダー読み飛ばし
-
-    int count = 0;
-    while (fgets(line, sizeof(line), fp) && count < MAX_N) {
-        sscanf(line, "%lf,%lf", &cities[count].x, &cities[count].y);
-        count++;
-    }
-
-    fclose(fp);
-    return count;
+    return converted;
 }
 
-// ツアーをoutput_{i}.csv に書き出す（format_tourと同様）
-void write_output(const char *filename, int *tour, int n) {
-    FILE *fp = fopen(filename, "w");
-    if (!fp) {
-        fprintf(stderr, "出力ファイルが作成できません: %s\n", filename);
-        return;
+// ツアー配列 → CSV形式文字列に変換
+char* format_tour(int* tour, int num_cities) {
+    char* buffer = malloc(16 * num_cities + 16);
+    strcpy(buffer, "index\n");
+
+    for (int i = 0; i < num_cities; i++) {
+        char line[16];
+        snprintf(line, sizeof(line), "%d\n", tour[i]);
+        strcat(buffer, line);
     }
 
-    fprintf(fp, "index\n");
-    for (int i = 0; i < n; ++i) {
-        fprintf(fp, "%d\n", tour[i]);
-    }
+    return buffer;
+}
 
-    fclose(fp);
+// 入力 → 出力ファイル生成ループ
+void generate_sample_output() {
+    for (int i = 0; i < CHALLENGES; i++) {
+        char input_filename[64];
+        snprintf(input_filename, sizeof(input_filename), "input_%d.csv", i);
+
+        int num_cities;
+        City* cities = read_input(input_filename, &num_cities);
+        if (!cities) {
+            fprintf(stderr, "Failed to read %s\n", input_filename);
+            continue;
+        }
+
+        double (*city_array)[2] = convert_city_array(cities, num_cities);
+        int* tour = solve(city_array, num_cities);
+
+        char* tour_str = format_tour(tour, num_cities);
+
+        char output_filename[64];
+        snprintf(output_filename, sizeof(output_filename), "output_%d.csv", i);
+        FILE* f = fopen(output_filename, "w");
+        if (f) {
+            fprintf(f, "%s\n", tour_str);
+            fclose(f);
+        } else {
+            fprintf(stderr, "Failed to write %s\n", output_filename);
+        }
+
+        free(city_array);
+        free(cities);
+        free(tour);
+        free(tour_str);
+    }
 }
 
 int main() {
-    for (int i = 0; i < CHALLENGES; ++i) {
-        char input_filename[64], output_filename[64];
-        snprintf(input_filename, sizeof(input_filename), "input_%d.csv", i);
-        snprintf(output_filename, sizeof(output_filename), "output_%d.csv", i);
-
-        City cities[MAX_N];
-        int n = read_input(input_filename, cities);
-        if (n <= 0) continue;
-
-        int tour[MAX_N];
-        simple_solver(tour, n); // solver_homework.solve(cities) に相当
-
-        write_output(output_filename, tour, n);
-    }
-
+    generate_sample_output();
     return 0;
 }
